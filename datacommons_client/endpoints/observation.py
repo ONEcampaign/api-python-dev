@@ -8,6 +8,29 @@ from datacommons_client.endpoints.payloads import ObservationSelect
 from datacommons_client.endpoints.response import ObservationResponse
 
 
+def _group_variables_by_entity(
+    data: dict[str, list[str]]) -> dict[str, list[str]]:
+  """Groups variables by the entities they are associated with.
+
+    Takes a dictionary mapping statistical variable DCIDs to a list of entity DCIDs,
+    and returns a new dictionary mapping each entity DCID to a list of statistical
+    variables available for that entity.
+
+    Args:
+        data: A dictionary where each key is a variable DCID and the value is a list
+            of entity DCIDs that have observations for that variable.
+
+    Returns:
+        A dictionary where each key is an entity DCID and the value is a list of
+        variable DCIDs available for that entity.
+    """
+  result: dict[str, list[str]] = {}
+  for variable, entities in data.items():
+    for entity in entities:
+      result.setdefault(entity, []).append(variable)
+  return result
+
+
 class ObservationEndpoint(Endpoint):
   """
     A class to interact with the observation API endpoint.
@@ -233,3 +256,31 @@ class ObservationEndpoint(Endpoint):
         filter_facet_domains=filter_facet_domains,
         filter_facet_ids=filter_facet_ids,
     )
+
+  def fetch_available_statistical_variables(
+      self,
+      entity_dcids: str | list[str],
+  ) -> dict[str, list[str]]:
+    """
+        Fetches available statistical variables (which have observations) for given entities.
+
+        Args:
+            entity_dcids (str | list[str]): One or more entity DCIDs(s) to fetch variables for.
+
+        Returns:
+            dict[str, list[str]]: A dictionary mapping entity DCIDs to their available statistical variables.
+        """
+
+    # Check if entity_dcids is a single string. If so, convert it to a list.
+    if isinstance(entity_dcids, str):
+      entity_dcids = [entity_dcids]
+
+    # Fetch observations for the given entity DCIDs. If variable is empty list
+    # all available variables are retrieved.
+    data = self.fetch(
+        entity_dcids=entity_dcids,
+        select=[ObservationSelect.VARIABLE, ObservationSelect.ENTITY],
+        variable_dcids=[],
+    ).get_data_by_entity()
+
+    return _group_variables_by_entity(data)
