@@ -22,6 +22,7 @@ def _extract_name_from_english_name_property(properties: list | Node) -> str:
     Args:
         properties (list): A list of properties with English names.
 
+    Returns:
         str: The extracted name.
     """
   if isinstance(properties, Node):
