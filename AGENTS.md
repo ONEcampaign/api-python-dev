@@ -5,25 +5,25 @@ is exclusively on the `datacommons_client` package, which is a Python client for
 Data Commons API. The other packages are not actively maintained and should not be used for new development.
 
 ## Dev Environment Tips
-- We use hatch to manage the Python environment, dependencies, and development tools.
+- We use `uv` to manage the Python environment, dependencies, and development tools.
 - To set up the Python environment for development, run:
   ```bash
-  ./run_test.sh -s
+  uv sync
   ```
 - To run tests, use:
   ```bash
-  hatch run test:all
+  uv run pytest
   ```
 
 # Linting and Formatting
 - We use `isort` and `yapf` for code formatting.
 - To check formatting, run:
   ```bash
-  hatch run lint:check
+  uv run ./run_test.sh -l
   ```
 - To automatically fix formatting, run:
   ```bash
-    hatch run lint:format
+    uv run ./run_test.sh -f
     ```
   
 - This repository adheres strictly to the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html).
