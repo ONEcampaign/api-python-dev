@@ -2,9 +2,9 @@ from unittest.mock import MagicMock
 
 from datacommons_client.endpoints.base import API
 from datacommons_client.endpoints.observation import ObservationEndpoint
-from datacommons_client.endpoints.payloads import ObservationDate
-from datacommons_client.endpoints.payloads import ObservationSelect
 from datacommons_client.endpoints.response import ObservationResponse
+from datacommons_client.models.observation import ObservationDate
+from datacommons_client.models.observation import ObservationSelect
 
 
 def test_fetch():

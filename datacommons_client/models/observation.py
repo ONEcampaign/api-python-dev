@@ -1,11 +1,88 @@
 from dataclasses import dataclass
 from dataclasses import field
-from typing import Any, Dict, TypeAlias
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
-variableDCID: TypeAlias = str
-facetID: TypeAlias = str
+from pydantic import BaseModel
+from pydantic import field_validator
+from pydantic import model_serializer
 
-orderedFacetsLabel: TypeAlias = str
+from datacommons_client.models.base import orderedFacetsLabel
+from datacommons_client.utils.error_handling import InvalidObservationSelectError
+
+
+class ObservationDate(str, Enum):
+  LATEST = "LATEST"
+  ALL = ""
+
+  @classmethod
+  def _missing_(cls, value):
+    if isinstance(value, str):
+      u = value.strip().upper()
+      if u == "LATEST":
+        return cls.LATEST
+      if u in ("ALL", ""):
+        return cls.ALL
+    raise ValueError(f"Invalid date value: '{value}'. Only 'LATEST' or"
+                     f" '' (empty string) are allowed.")
+
+
+class ObservationSelect(str, Enum):
+  DATE = "date"
+  VARIABLE = "variable"
+  ENTITY = "entity"
+  VALUE = "value"
+  FACET = "facet"
+
+  @classmethod
+  def valid_values(cls):
+    """Returns a list of valid enum values."""
+    return sorted(cls._value2member_map_.keys())
+
+  @classmethod
+  def _missing_(cls, value):
+    """Handle missing enum values by raising a custom error."""
+    message = f"Invalid `select` field: '{value}'. Only {', '.join(cls.valid_values())} are allowed."
+    raise InvalidObservationSelectError(message=message)
+
+
+class ObservationSelectList(BaseModel):
+  """A model to represent a list of ObservationSelect values.
+
+    Attributes:
+        select (List[ObservationSelect]): A list of ObservationSelect enum values.
+    """
+
+  select: Optional[List[ObservationSelect | str]] = None
+
+  @field_validator("select", mode="before")
+  def _validate_select(cls, v):
+    if v is None:
+      select = [
+          ObservationSelect.DATE,
+          ObservationSelect.VARIABLE,
+          ObservationSelect.ENTITY,
+          ObservationSelect.VALUE,
+      ]
+    else:
+      select = v
+
+    select = [ObservationSelect(s).value for s in select]
+
+    required_select = {"variable", "entity"}
+
+    missing_fields = required_select - set(select)
+    if missing_fields:
+      raise ValueError(
+          f"The 'select' field must include at least the following: {', '.join(required_select)} "
+          f"(missing: {', '.join(missing_fields)})")
+
+    return select
+
+  @model_serializer
+  def serialize(self) -> list:
+    """Return directly as list"""
+    return self.select
 
 
 @dataclass

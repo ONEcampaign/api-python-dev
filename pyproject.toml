@@ -12,9 +12,14 @@ maintainers = [
 ]
 license = { file = "LICENSE" }
 dependencies = [
-"requests>=2.32",
-"typing_extensions",
-    "pydantic>=2.11"
+    "requests>=2.32",
+    "typing_extensions",
+    "pydantic>=2.11",
+    "yapf>=0.43.0",
+    "mock>=5.2.0",
+    "pandas>=2.2.3",
+    "pytest>=8.3.5",
+    "isort>=6.0.1",
 ]
 requires-python = ">=3.10"
 keywords = ["data commons", "api", "data", "development"]
@@ -107,3 +112,8 @@ tag = "git commit -am 'Bump version to {version}' && git tag v{version}"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+]

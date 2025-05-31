@@ -1,6 +1,8 @@
 from dataclasses import asdict
 import json
-from typing import Any, Dict
+from typing import Annotated, Any, Dict, Iterable, TypeAlias
+
+from pydantic import BeforeValidator
 
 
 class SerializableMixin:
@@ -37,3 +39,18 @@ class SerializableMixin:
             str: The JSON string representation of the instance.
         """
     return json.dumps(self.to_dict(exclude_none=exclude_none), indent=2)
+
+
+def listify(v: Any) -> list[str]:
+  if isinstance(v, (str, bytes)):
+    return [v]
+  if not isinstance(v, Iterable):
+    return [v]
+  return list(v)
+
+
+variableDCID: TypeAlias = str
+facetID: TypeAlias = str
+orderedFacetsLabel: TypeAlias = str
+
+ListOrStr = Annotated[list[str] | str, BeforeValidator(listify)]

@@ -56,7 +56,7 @@ class ResolveEndpoint(Endpoint):
 
     # Construct the payload
     payload = ResolveRequestPayload(node_dcids=node_ids,
-                                    expression=expression).to_dict
+                                    expression=expression).to_dict()
 
     # Send the request and return the response
     return ResolveResponse.from_json(self.post(payload))

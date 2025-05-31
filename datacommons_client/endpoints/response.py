@@ -2,18 +2,17 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any, Dict, List, Optional
 
+from datacommons_client.models.base import facetID
 from datacommons_client.models.base import SerializableMixin
+from datacommons_client.models.base import variableDCID
 from datacommons_client.models.node import Arcs
 from datacommons_client.models.node import NextToken
 from datacommons_client.models.node import Node
 from datacommons_client.models.node import NodeDCID
-from datacommons_client.models.node import NodeGroup
 from datacommons_client.models.node import Properties
 from datacommons_client.models.node import Property
 from datacommons_client.models.observation import Facet
-from datacommons_client.models.observation import facetID
 from datacommons_client.models.observation import Variable
-from datacommons_client.models.observation import variableDCID
 from datacommons_client.models.resolve import Entity
 from datacommons_client.utils.data_processing import flatten_properties
 from datacommons_client.utils.data_processing import observations_as_records
