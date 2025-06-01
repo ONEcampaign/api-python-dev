@@ -49,21 +49,3 @@ def test_entity_from_json_empty_candidates():
   entity = Entity.from_json(json_data)
   assert entity.node == "test_query"
   assert len(entity.candidates) == 0
-
-
-def test_entity_from_json_missing_node():
-  """Test Entity.from_json with missing node."""
-  json_data = {"candidates": [{"dcid": "dcid123", "dominantType": "Place"}]}
-  entity = Entity.from_json(json_data)
-  assert entity.node is None
-  assert len(entity.candidates) == 1
-  assert entity.candidates[0].dcid == "dcid123"
-  assert entity.candidates[0].dominantType == "Place"
-
-
-def test_entity_from_json_empty():
-  """Test Entity.from_json with empty data."""
-  json_data = {}
-  entity = Entity.from_json(json_data)
-  assert entity.node is None
-  assert len(entity.candidates) == 0

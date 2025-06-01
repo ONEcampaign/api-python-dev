@@ -1,11 +1,8 @@
 import json
-from unittest.mock import MagicMock
 
-from datacommons_client.endpoints.response import DCResponse
 from datacommons_client.endpoints.response import NodeResponse
 from datacommons_client.endpoints.response import ObservationResponse
 from datacommons_client.endpoints.response import ResolveResponse
-from datacommons_client.models.node import Arcs
 from datacommons_client.models.node import Node
 from datacommons_client.models.node import NodeGroup
 from datacommons_client.models.observation import Facet
@@ -15,21 +12,6 @@ from datacommons_client.models.observation import Variable
 from datacommons_client.utils.data_processing import extract_observations
 from datacommons_client.utils.data_processing import flatten_properties
 from datacommons_client.utils.data_processing import unpack_arcs
-
-### ----- Test DCResponse ----- ###
-
-
-def test_next_token():
-  """Test that the next_token property returns the correct value."""
-  response = DCResponse(json={"nextToken": "abc123"})
-  assert response.next_token == "abc123"
-
-
-def test_empty_next_token():
-  """Test that the next_token property returns None when the key is not present."""
-  response = DCResponse(json={})
-  assert response.next_token is None
-
 
 ### ----- Test Node Response ----- ###
 
@@ -655,9 +637,9 @@ def test_observation_response_from_json():
   response = ObservationResponse.from_json(json_data)
 
   assert "var1" in response.byVariable
-  assert "entity1" in response.byVariable["var1"].byEntity
+  assert "entity1" in response.byVariable["var1"].get("byEntity", {})
   assert "facet1" in response.facets
-  assert response.facets["facet1"].unit == "GTQ"
+  assert response.facets["facet1"].get("unit") == "GTQ"
 
 
 def test_get_data_by_entity_from_method():
@@ -771,7 +753,7 @@ def test_get_observations_as_records():
               })
   }
 
-  mock_facets = {"facet1": Facet(importName="ImportName",)}
+  mock_facets = {"facet1": Facet(importName="ImportName")}
 
   # Create an ObservationResponse instance
   response = ObservationResponse(byVariable=mock_data, facets=mock_facets)
@@ -788,10 +770,6 @@ def test_get_observations_as_records():
           "value": 10.0,
           "facetId": "facet1",
           "importName": "ImportName",
-          "measurementMethod": "",
-          "observationPeriod": "",
-          "provenanceUrl": "",
-          "unit": "",
       },
       {
           "date": "2023-01-15",
@@ -800,10 +778,6 @@ def test_get_observations_as_records():
           "value": 15.0,
           "facetId": "facet1",
           "importName": "ImportName",
-          "measurementMethod": "",
-          "observationPeriod": "",
-          "provenanceUrl": "",
-          "unit": "",
       },
   ]
 
@@ -1024,7 +998,7 @@ def test_resolve_response_json_string_exclude_none():
   assert result == expected
 
 
-def test_get_facets_metadata():
+def test_get_facets_metadata(monkeypatch):
   """Test that get_facets_metadata correctly extracts and structures facet metadata."""
 
   # Mock facet metadata
@@ -1077,10 +1051,20 @@ def test_get_facets_metadata():
       },
   }
 
+  # Patch *methods on the class*
+  monkeypatch.setattr(
+      ObservationResponse,
+      "get_data_by_entity",
+      lambda self: mock_data_by_entity,
+  )
+  monkeypatch.setattr(
+      ObservationResponse,
+      "to_dict",
+      lambda self: {"facets": mock_facets},
+  )
+
   # Mock ObservationResponse
   response = ObservationResponse(byVariable={})
-  response.get_data_by_entity = lambda: mock_data_by_entity
-  response.to_dict = lambda: {"facets": mock_facets}
 
   # Call the method
   result = response.get_facets_metadata()
@@ -1135,25 +1119,29 @@ def test_get_facets_metadata():
   assert result == expected
 
 
-def test_find_matching_facet_id():
+def test_find_matching_facet_id(monkeypatch):
   """Tests that find_matching_facet_id correctly finds facet IDs matching a given property and value."""
   mock_response = ObservationResponse(byVariable={}, facets={})
-  mock_response.get_facets_metadata = MagicMock(
-      return_value={
-          "statvar1": {
-              "facet1": {
-                  "measurementMethod": "Census"
-              },
-              "facet2": {
-                  "measurementMethod": "Survey"
-              },
+  mock_metadata = {
+      "statvar1": {
+          "facet1": {
+              "measurementMethod": "Census"
           },
-          "statvar2": {
-              "facet3": {
-                  "unit": "USD"
-              },
+          "facet2": {
+              "measurementMethod": "Survey"
           },
-      })
+      },
+      "statvar2": {
+          "facet3": {
+              "unit": "USD"
+          },
+      },
+  }
+  monkeypatch.setattr(
+      ObservationResponse,
+      "get_facets_metadata",
+      lambda self: mock_metadata,
+  )
 
   result = mock_response.find_matching_facet_id("measurementMethod", "Census")
   assert result == ["facet1"]

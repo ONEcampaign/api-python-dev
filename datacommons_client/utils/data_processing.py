@@ -10,6 +10,8 @@ from datacommons_client.models.node import NodeDCID
 from datacommons_client.models.node import NodeGroup
 from datacommons_client.models.node import Properties
 from datacommons_client.models.node import Property
+from datacommons_client.models.observation import Facet
+from datacommons_client.models.observation import OrderedFacets
 
 
 def unpack_arcs(arcs: Dict[ArcLabel, NodeGroup]) -> Dict[Property, List[Node]]:
@@ -55,7 +57,7 @@ def flatten_properties(
 
 
 def extract_observations(variable: str, entity: str, entity_data: dict,
-                         facet_metadata: dict) -> list[dict]:
+                         facet_metadata: dict[str, Facet]) -> list[dict]:
   """
     Extracts observations for a given variable, entity, and its data.
 
@@ -63,21 +65,24 @@ def extract_observations(variable: str, entity: str, entity_data: dict,
         variable (str): The variable name.
         entity (str): The entity name.
         entity_data (dict): Data for the entity, including ordered facets.
-        facet_metadata (dict): Metadata for facets.
+        facet_metadata (OrderedFacets): Metadata for facets.
 
     Returns:
         list[dict]: A list of observation records.
     """
-  return [{
-      "date": observation.date,
-      "entity": entity,
-      "variable": variable,
-      "value": observation.value,
-      "facetId": facet.facetId,
-      **asdict(facet_metadata.get(facet.facetId, {})),
-  }
-          for facet in entity_data.get("orderedFacets", [])
-          for observation in facet.observations]
+  observations = []
+  for facet in entity_data.get("orderedFacets", []):
+    for observation in facet.observations:
+      observations.append({
+          "date": observation.date,
+          "entity": entity,
+          "variable": variable,
+          "value": observation.value,
+          "facetId": facet.facetId,
+          **facet_metadata.get(facet.facetId, Facet()).to_dict(),
+      })
+
+  return observations
 
 
 def observations_as_records(data: dict, facets: dict) -> list[dict]:

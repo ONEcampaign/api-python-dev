@@ -64,18 +64,20 @@ def test_nodegroup_from_json_empty():
 def test_arcs_from_json():
   """Test the Arcs.from_json method."""
   json_data = {
-      "label1": {
-          "nodes": [{
-              "dcid": "node1"
-          }, {
-              "dcid": "node2"
-          }]
-      },
-      "label2": {
-          "nodes": [{
-              "dcid": "node3"
-          }]
-      },
+      "arcs": {
+          "label1": {
+              "nodes": [{
+                  "dcid": "node1"
+              }, {
+                  "dcid": "node2"
+              }]
+          },
+          "label2": {
+              "nodes": [{
+                  "dcid": "node3"
+              }]
+          },
+      }
   }
   arcs = Arcs.from_json(json_data)
   assert len(arcs.arcs) == 2
@@ -105,4 +107,4 @@ def test_properties_from_json_empty():
   """Test Properties.from_json with empty data."""
   json_data = {}
   properties = Properties.from_json(json_data)
-  assert len(properties.properties) == 0
+  assert properties.properties is None

@@ -10,6 +10,7 @@ from datacommons_client.models.observation import ObservationSelect
 def test_fetch():
   """Tests the fetch method of ObservationEndpoint."""
   api_mock = MagicMock(spec=API)
+  api_mock.post = MagicMock(return_value={})
   endpoint = ObservationEndpoint(api=api_mock)
 
   response = endpoint.fetch(variable_dcids="dcid/variableID",
@@ -45,6 +46,7 @@ def test_fetch():
 def test_fetch_observations_by_entity_type():
   """Tests the fetch_observations_by_entity_type method."""
   api_mock = MagicMock(spec=API)
+  api_mock.post = MagicMock(return_value={})
   endpoint = ObservationEndpoint(api=api_mock)
 
   response = endpoint.fetch_observations_by_entity_type(
@@ -76,6 +78,7 @@ def test_fetch_observations_by_entity_type():
 def test_fetch_observations_facets_by_entity_type():
   """Tests the fetch_observations_by_entity_type method."""
   api_mock = MagicMock(spec=API)
+  api_mock.post = MagicMock(return_value={})
   endpoint = ObservationEndpoint(api=api_mock)
 
   response = endpoint.fetch_observations_by_entity_type(

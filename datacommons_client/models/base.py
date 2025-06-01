@@ -1,12 +1,15 @@
-from dataclasses import asdict
-import json
 from typing import Annotated, Any, Dict, Iterable, TypeAlias
 
+from pydantic import BaseModel
 from pydantic import BeforeValidator
 
 
-class SerializableMixin:
+class BaseDCModel(BaseModel):
   """Provides serialization methods for the Response dataclasses."""
+
+  @classmethod
+  def from_json(cls, json_data: Dict[str, Any]) -> "BaseDCModel":
+    return cls.model_validate(json_data)
 
   def to_dict(self, exclude_none: bool = True) -> Dict[str, Any]:
     """Converts the instance to a dictionary.
@@ -18,16 +21,7 @@ class SerializableMixin:
             Dict[str, Any]: The dictionary representation of the instance.
         """
 
-    def _remove_none(data: Any) -> Any:
-      """Recursively removes None or empty values from a dictionary or list."""
-      if isinstance(data, dict):
-        return {k: _remove_none(v) for k, v in data.items() if v is not None}
-      elif isinstance(data, list):
-        return [_remove_none(item) for item in data]
-      return data
-
-    result = asdict(self)
-    return _remove_none(result) if exclude_none else result
+    return self.model_dump(mode="python", exclude_none=exclude_none)
 
   def to_json(self, exclude_none: bool = True) -> str:
     """Converts the instance to a JSON string.
@@ -38,7 +32,7 @@ class SerializableMixin:
         Returns:
             str: The JSON string representation of the instance.
         """
-    return json.dumps(self.to_dict(exclude_none=exclude_none), indent=2)
+    return self.model_dump_json(exclude_none=exclude_none, indent=2)
 
 
 def listify(v: Any) -> list[str]:
