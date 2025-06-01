@@ -1,13 +1,12 @@
 from typing import Optional
 
-from pydantic import BaseModel
-from pydantic import ConfigDict
 from pydantic import Field
 from pydantic import field_serializer
 from pydantic import field_validator
 from pydantic import model_serializer
 from pydantic import model_validator
 
+from datacommons_client.models.base import BaseDCModel
 from datacommons_client.models.base import ListOrStr
 from datacommons_client.models.observation import ObservationDate
 from datacommons_client.models.observation import ObservationSelect
@@ -23,27 +22,7 @@ def normalize_list_to_string(value: str | list[str]) -> str:
   return value
 
 
-class EndpointRequestPayload(BaseModel):
-  """
-    A Pydantic model to mixin the required serialization options for API request payloads.
-
-    """
-
-  model_config = ConfigDict(
-      validate_by_name=True,
-      validate_by_alias=True,
-      use_enum_values=True,
-      serialize_by_alias=True,
-  )
-
-  def to_dict(self) -> dict:
-    return self.model_dump(mode="python", exclude_none=True)
-
-  def to_json(self) -> str:
-    return self.model_dump_json(indent=2, exclude_none=True)
-
-
-class NodeRequestPayload(EndpointRequestPayload):
+class NodeRequestPayload(BaseDCModel):
   """
     A Pydantic model to structure, normalize, and validate the payload for a Node V2 API request.
 
@@ -56,7 +35,7 @@ class NodeRequestPayload(EndpointRequestPayload):
   expression: list | str = Field(..., serialization_alias="property")
 
 
-class ObservationRequestPayload(EndpointRequestPayload):
+class ObservationRequestPayload(BaseDCModel):
   """
     A Pydantic model to structure, normalize, and validate the payload for an Observation V2 API request.
 
@@ -143,7 +122,7 @@ class ObservationRequestPayload(EndpointRequestPayload):
     return data
 
 
-class ResolveRequestPayload(EndpointRequestPayload):
+class ResolveRequestPayload(BaseDCModel):
   """
     A Pydantic model to structure, normalize, and validate the payload for a Resolve V2 API request.
 

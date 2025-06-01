@@ -2,10 +2,18 @@ from typing import Annotated, Any, Dict, Iterable, TypeAlias
 
 from pydantic import BaseModel
 from pydantic import BeforeValidator
+from pydantic import ConfigDict
 
 
 class BaseDCModel(BaseModel):
   """Provides serialization methods for the Response dataclasses."""
+
+  model_config = ConfigDict(
+      validate_by_name=True,
+      validate_by_alias=True,
+      use_enum_values=True,
+      serialize_by_alias=True,
+  )
 
   @classmethod
   def from_json(cls, json_data: Dict[str, Any]) -> "BaseDCModel":
