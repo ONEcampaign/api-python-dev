@@ -69,7 +69,7 @@ class ObservationRequestPayload(BaseDCModel):
 
   @field_validator("select", mode="before")
   def _coerce_select(cls, v):
-    return ObservationSelectList(select=v).select
+    return ObservationSelectList.model_validate(v).select
 
   @field_validator("entity_expression", mode="before")
   def _coerce_expr(cls, v):

@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from pydantic import Field
 from pydantic import field_validator
 from pydantic import model_serializer
+from pydantic import RootModel
 
 from datacommons_client.models.base import BaseDCModel
 from datacommons_client.models.base import orderedFacetsLabel
@@ -46,16 +47,16 @@ class ObservationSelect(str, Enum):
     raise InvalidObservationSelectError(message=message)
 
 
-class ObservationSelectList(BaseModel):
+class ObservationSelectList(RootModel[list[ObservationSelect]]):
   """A model to represent a list of ObservationSelect values.
 
     Attributes:
         select (List[ObservationSelect]): A list of ObservationSelect enum values.
     """
 
-  select: Optional[List[ObservationSelect | str]] = None
+  root: Optional[list[ObservationSelect | str]] = None
 
-  @field_validator("select", mode="before")
+  @field_validator("root", mode="before")
   def _validate_select(cls, v):
     if v is None:
       select = [
@@ -71,18 +72,18 @@ class ObservationSelectList(BaseModel):
 
     required_select = {"variable", "entity"}
 
-    missing_Fields = required_select - set(select)
-    if missing_Fields:
-      raise ValueError(
-          f"The 'select' Field must include at least the following: {', '.join(required_select)} "
-          f"(missing: {', '.join(missing_Fields)})")
+    missing_fields = required_select - set(select)
+    if missing_fields:
+      raise InvalidObservationSelectError(message=(
+          f"The 'select' field must include at least the following: {', '.join(required_select)} "
+          f"(missing: {', '.join(missing_fields)})"))
 
     return select
 
-  @model_serializer
-  def serialize(self) -> list:
-    """Return directly as list"""
-    return self.select
+  @property
+  def select(self) -> list[str]:
+    """Return select values directly as list"""
+    return self.root or []
 
 
 class Observation(BaseDCModel):

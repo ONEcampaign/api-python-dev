@@ -1,7 +1,11 @@
+import pytest
+
 from datacommons_client.models.observation import Facet
 from datacommons_client.models.observation import Observation
+from datacommons_client.models.observation import ObservationSelectList
 from datacommons_client.models.observation import OrderedFacets
 from datacommons_client.models.observation import Variable
+from datacommons_client.utils.error_handling import InvalidObservationSelectError
 
 
 def test_observation_from_json():
@@ -133,3 +137,21 @@ def test_facet_from_json_partial():
   assert facet.measurementMethod is None
   assert facet.unit == "GTQ"
   assert facet.provenanceUrl is None
+
+
+def test_observation_select_list_defaults():
+  """ObservationSelectList returns default selects when none provided."""
+  osl = ObservationSelectList.model_validate(None)
+  assert osl.select == ["date", "variable", "entity", "value"]
+
+
+def test_observation_select_list_custom():
+  """ObservationSelectList accepts custom select lists."""
+  osl = ObservationSelectList.model_validate(["variable", "entity", "facet"])
+  assert osl.select == ["variable", "entity", "facet"]
+
+
+def test_observation_select_list_missing_required():
+  """Missing required select entries raises InvalidObservationSelectError."""
+  with pytest.raises(InvalidObservationSelectError):
+    ObservationSelectList.model_validate(["date", "value"])

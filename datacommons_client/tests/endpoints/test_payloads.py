@@ -72,7 +72,7 @@ def test_observation_select_invalid_value():
 
 def test_observation_payload_validate():
   """Tests that ObservationRequestPayload validates its inputs."""
-  with pytest.raises(ValueError):
+  with pytest.raises(InvalidObservationSelectError):
     ObservationRequestPayload(
         date="LATEST",
         variable_dcids="var1",
@@ -81,7 +81,7 @@ def test_observation_payload_validate():
         entity_expression=None,
     )  # Requires either `entity_dcids` or `entity_expression`
 
-  with pytest.raises(ValueError):
+  with pytest.raises(InvalidObservationSelectError):
     ObservationRequestPayload(
         date="LATEST",
         variable_dcids="var1",
