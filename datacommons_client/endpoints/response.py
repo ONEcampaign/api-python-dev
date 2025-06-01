@@ -39,8 +39,8 @@ class NodeResponse(BaseDCModel):
       if isinstance(data, (Arcs, Properties)):
         return data
       if "arcs" in data:
-        return Arcs.from_json(data)
-      return Properties.from_json(data)
+        return Arcs.model_validate(data)
+      return Properties.model_validate(data)
 
     return {dcid: _parse_data(data) for dcid, data in raw_data.items()}
 

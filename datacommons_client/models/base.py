@@ -21,7 +21,7 @@ ListOrStr = Annotated[list[str] | str, BeforeValidator(listify)]
 
 
 class BaseDCModel(BaseModel):
-  """Provides serialization methods for the Response dataclasses."""
+  """Provides serialization methods for the Pydantic models used by the client."""
 
   model_config = ConfigDict(
       validate_by_name=True,
@@ -30,10 +30,6 @@ class BaseDCModel(BaseModel):
       use_enum_values=True,
       serialize_by_alias=True,
   )
-
-  @classmethod
-  def from_json(cls, json_data: Dict[str, Any]) -> "BaseDCModel":
-    return cls.model_validate(json_data)
 
   def to_dict(self, exclude_none: bool = True) -> Dict[str, Any]:
     """Converts the instance to a dictionary.

@@ -61,7 +61,7 @@ class ObservationEndpoint(Endpoint):
     ).to_dict()
 
     # Send the request
-    return ObservationResponse.from_json(self.post(payload))
+    return ObservationResponse.model_validate(self.post(payload))
 
   def fetch_observations_by_entity_type(
       self,

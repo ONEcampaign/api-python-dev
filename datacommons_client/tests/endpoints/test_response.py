@@ -16,8 +16,8 @@ from datacommons_client.utils.data_processing import unpack_arcs
 ### ----- Test Node Response ----- ###
 
 
-def test_node_response_from_json():
-  """Test that the NodeResponse.from_json method correctly parses JSON data."""
+def test_node_response_model_validation():
+  """Test that NodeResponse.model_validate correctly parses JSON data."""
 
   # Mocking JSON data
   json_data = {
@@ -35,7 +35,7 @@ def test_node_response_from_json():
       "nextToken": "token123",
   }
 
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
 
   assert response.nextToken == "token123"
   assert response.data["geoId/06"].properties == [
@@ -65,7 +65,7 @@ def test_node_as_dict():
       "nextToken": "token123",
   }
 
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = response.to_dict()
 
   assert result == json_data
@@ -89,7 +89,7 @@ def test_node_as_dict_exclude_none():
       "nextToken": "token123",
   }
 
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = response.to_dict(exclude_none=True)
 
   assert result == expected
@@ -106,7 +106,7 @@ def test_node_as_dict_include_none():
       "nextToken": "token123",
   }
 
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = response.to_dict(exclude_none=False)
 
   assert result == json_data
@@ -130,7 +130,7 @@ def test_flatten_properties():
       }
   }
 
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = flatten_properties(response.data)
   function_result = response.get_properties()
 
@@ -161,7 +161,7 @@ def test_flatten_arcs():
           }
       }
   }
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = flatten_properties(response.data)
 
   assert "dc/03lw9rhpendw5" in result
@@ -206,7 +206,7 @@ def test_flatten_multiple_arcs_with_multiple_nodes():
       }
   }
 
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = flatten_properties(response.data)
   function_result = response.get_properties()
 
@@ -312,7 +312,7 @@ def test_extract_connected_dcids():
           }
       }
   }
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = response.extract_connected_dcids(subject_dcid='geoId/06',
                                             property_dcid='containedInPlace')
   assert result == ['country/USA', 'usc/PacificDivision']
@@ -335,7 +335,7 @@ def test_extract_connected_dcids_with_nonexistent_dcid():
           },
       }
   }
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = response.extract_connected_dcids(subject_dcid='geoId/07',
                                             property_dcid='name')
   assert result == []
@@ -358,7 +358,7 @@ def test_extract_connected_dcids_with_nonexistent_property():
           },
       }
   }
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = response.extract_connected_dcids(subject_dcid='geoId/06',
                                             property_dcid='containedInPlace')
   assert result == []
@@ -381,7 +381,7 @@ def test_extract_connected_dcids_does_not_include_none_for_value_only_nodes():
           },
       }
   }
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = response.extract_connected_dcids(subject_dcid='geoId/06',
                                             property_dcid='name')
   assert result == []
@@ -414,7 +414,7 @@ def test_extract_connected_dcids_with_node_type_filter():
           },
       }
   }
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = response.extract_connected_dcids(subject_dcid='geoId/06',
                                             property_dcid='relatedPlaces',
                                             connected_node_types="Country")
@@ -448,7 +448,7 @@ def test_extract_connected_dcids_with_multiple_node_type_filter():
           },
       }
   }
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = response.extract_connected_dcids(
       subject_dcid='geoId/06',
       property_dcid='relatedPlaces',
@@ -484,7 +484,7 @@ def test_extract_connected_nodes_with_multiple_node_type_filter():
           },
       }
   }
-  response = NodeResponse.from_json(json_data)
+  response = NodeResponse.model_validate(json_data)
   result = response.extract_connected_nodes(
       subject_dcid='geoId/06',
       property_dcid='relatedPlaces',
@@ -568,7 +568,7 @@ def test_observation_as_dict():
   }
 
   # Parsing JSON data
-  response = ObservationResponse.from_json(json_data)
+  response = ObservationResponse.model_validate(json_data)
 
   # Getting it back as a dictionary
   result = response.to_dict()
@@ -602,7 +602,7 @@ def test_observation_as_dict_exclude_none():
   }
 
   # Parsing JSON data
-  response = ObservationResponse.from_json(json_data)
+  response = ObservationResponse.model_validate(json_data)
 
   # Getting it back as a dictionary
   result = response.to_dict(exclude_none=True)
@@ -611,8 +611,8 @@ def test_observation_as_dict_exclude_none():
           ["entity1"]["orderedFacets"][0])
 
 
-def test_observation_response_from_json():
-  """Test that the ObservationResponse.from_json method parses JSON correctly."""
+def test_observation_response_model_validation():
+  """Test that ObservationResponse.model_validate parses JSON correctly."""
   json_data = {
       "byVariable": {
           "var1": {
@@ -634,7 +634,7 @@ def test_observation_response_from_json():
   }
 
   # Parsing JSON data
-  response = ObservationResponse.from_json(json_data)
+  response = ObservationResponse.model_validate(json_data)
 
   assert "var1" in response.byVariable
   assert "entity1" in response.byVariable["var1"].byEntity
@@ -788,8 +788,8 @@ def test_get_observations_as_records():
 ### ----- Test Resolve Response ----- ###
 
 
-def test_resolve_response_from_json():
-  """Test that ResolveResponse.from_json correctly parses entities and candidates."""
+def test_resolve_response_model_validation():
+  """Test that ResolveResponse.model_validate parses entities and candidates."""
   # Mock input JSON
   json_data = {
       "entities": [
@@ -818,7 +818,7 @@ def test_resolve_response_from_json():
   }
 
   # Parse the response
-  response = ResolveResponse.from_json(json_data)
+  response = ResolveResponse.model_validate(json_data)
 
   # Assert the number of entities
   assert len(response.entities) == 2
@@ -870,7 +870,7 @@ def test_resolve_response_dict():
   }
 
   # Create ResolveResponse from the dictionary
-  response = ResolveResponse.from_json(input_data)
+  response = ResolveResponse.model_validate(input_data)
 
   # Convert back to dictionary using the json property
   result = response.to_dict(exclude_none=False)
@@ -943,7 +943,7 @@ def test_resolve_response_dict_exclude_none():
   }
 
   # Create ResolveResponse from the dictionary
-  response = ResolveResponse.from_json(input_data)
+  response = ResolveResponse.model_validate(input_data)
 
   # Convert back to dictionary using the json property
   result = response.to_dict(exclude_none=True)
@@ -989,7 +989,7 @@ def test_resolve_response_json_string_exclude_none():
   expected = json.dumps(input_data, indent=2)
 
   # Create ResolveResponse from the dictionary
-  response = ResolveResponse.from_json(input_data)
+  response = ResolveResponse.model_validate(input_data)
 
   # Convert back to dictionary using the json property
   result = response.to_json(exclude_none=False)

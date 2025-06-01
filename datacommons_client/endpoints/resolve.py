@@ -59,7 +59,7 @@ class ResolveEndpoint(Endpoint):
                                     expression=expression).to_dict()
 
     # Send the request and return the response
-    return ResolveResponse.from_json(self.post(payload))
+    return ResolveResponse.model_validate(self.post(payload))
 
   def fetch_dcids_by_name(self,
                           names: str | list[str],

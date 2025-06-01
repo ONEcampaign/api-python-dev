@@ -118,7 +118,7 @@ class NodeEndpoint(Endpoint):
                                  expression=expression).to_dict()
 
     # Make the request and return the response.
-    return NodeResponse.from_json(
+    return NodeResponse.model_validate(
         self.post(payload, all_pages=all_pages, next_token=next_token))
 
   def fetch_property_labels(
