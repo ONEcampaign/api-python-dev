@@ -69,4 +69,4 @@ class Properties(BaseDCModel):
         properties: A list of property strings.
     """
 
-  properties: Optional[PropertyList] = Field(default=None)
+  properties: Optional[PropertyList] = None

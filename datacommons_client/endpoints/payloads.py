@@ -50,10 +50,11 @@ class ObservationRequestPayload(BaseDCModel):
         filter_facet_ids (Optional[str | list[str]]): One or more facet IDs to filter the data.
     """
 
-  date: ObservationDate | str = Field(default="", validate_default=True)
+  date: ObservationDate | str = Field(default_factory=str,
+                                      validate_default=True)
   variable_dcids: Optional[ListOrStr] = Field(default=None,
                                               serialization_alias="variable")
-  select: Optional[list[str]] = Field(default=None, validate_default=True)
+  select: Optional[list[str]] = None
   entity_dcids: Optional[ListOrStr] = None
   entity_expression: Optional[str | list[str]] = None
   filter_facet_domains: Optional[ListOrStr] = None

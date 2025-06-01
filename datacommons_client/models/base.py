@@ -25,6 +25,7 @@ class BaseDCModel(BaseModel):
 
   model_config = ConfigDict(
       validate_by_name=True,
+      validate_default=True,
       validate_by_alias=True,
       use_enum_values=True,
       serialize_by_alias=True,

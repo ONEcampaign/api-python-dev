@@ -94,7 +94,7 @@ class Observation(BaseDCModel):
     """
 
   date: str
-  value: Optional[float] = Field(default=None)
+  value: Optional[float] = None
 
 
 class OrderedFacets(BaseDCModel):
@@ -108,10 +108,10 @@ class OrderedFacets(BaseDCModel):
         observations (List[Observation]): A list of observations associated with the facet.
     """
 
-  earliestDate: Optional[str] = Field(default=None)
-  facetId: Optional[str] = Field(default=None)
-  latestDate: Optional[str] = Field(default=None)
-  obsCount: Optional[int] = Field(default=None)
+  earliestDate: Optional[str] = None
+  facetId: Optional[str] = None
+  latestDate: Optional[str] = None
+  obsCount: Optional[int] = None
   observations: list[Observation] = Field(default_factory=list)
 
 
@@ -138,8 +138,8 @@ class Facet(BaseDCModel):
         unit (str): The unit of the observations.
     """
 
-  importName: Optional[str] = Field(default=None)
-  measurementMethod: Optional[str] = Field(default=None)
-  observationPeriod: Optional[str] = Field(default=None)
-  provenanceUrl: Optional[str] = Field(default=None)
-  unit: Optional[str] = Field(default=None)
+  importName: Optional[str] = None
+  measurementMethod: Optional[str] = None
+  observationPeriod: Optional[str] = None
+  provenanceUrl: Optional[str] = None
+  unit: Optional[str] = None
