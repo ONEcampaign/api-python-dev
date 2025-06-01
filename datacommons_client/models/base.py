@@ -4,6 +4,21 @@ from pydantic import BaseModel
 from pydantic import BeforeValidator
 from pydantic import ConfigDict
 
+variableDCID: TypeAlias = str
+facetID: TypeAlias = str
+orderedFacetsLabel: TypeAlias = str
+
+
+def listify(v: Any) -> list[str]:
+  if isinstance(v, (str, bytes)):
+    return [v]
+  if not isinstance(v, Iterable):
+    return [v]
+  return list(v)
+
+
+ListOrStr = Annotated[list[str] | str, BeforeValidator(listify)]
+
 
 class BaseDCModel(BaseModel):
   """Provides serialization methods for the Response dataclasses."""
@@ -41,18 +56,3 @@ class BaseDCModel(BaseModel):
             str: The JSON string representation of the instance.
         """
     return self.model_dump_json(exclude_none=exclude_none, indent=2)
-
-
-def listify(v: Any) -> list[str]:
-  if isinstance(v, (str, bytes)):
-    return [v]
-  if not isinstance(v, Iterable):
-    return [v]
-  return list(v)
-
-
-variableDCID: TypeAlias = str
-facetID: TypeAlias = str
-orderedFacetsLabel: TypeAlias = str
-
-ListOrStr = Annotated[list[str] | str, BeforeValidator(listify)]

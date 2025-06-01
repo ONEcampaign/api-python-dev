@@ -108,10 +108,10 @@ class OrderedFacets(BaseDCModel):
         observations (List[Observation]): A list of observations associated with the facet.
     """
 
-  earliestDate: Optional[str] = Field(default_factory=str)
-  facetId: Optional[str] = Field(default_factory=str)
-  latestDate: Optional[str] = Field(default_factory=str)
-  obsCount: Optional[int] = Field(default_factory=int)
+  earliestDate: Optional[str] = Field(default=None)
+  facetId: Optional[str] = Field(default=None)
+  latestDate: Optional[str] = Field(default=None)
+  obsCount: Optional[int] = Field(default=None)
   observations: list[Observation] = Field(default_factory=list)
 
 

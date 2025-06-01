@@ -12,6 +12,8 @@ from datacommons_client.models.node import Node
 from datacommons_client.models.node import NodeDCID
 from datacommons_client.models.node import Properties
 from datacommons_client.models.node import Property
+from datacommons_client.models.observation import Facet
+from datacommons_client.models.observation import Variable
 from datacommons_client.models.resolve import Entity
 from datacommons_client.utils.data_processing import flatten_properties
 from datacommons_client.utils.data_processing import observations_as_records
@@ -120,8 +122,8 @@ class ObservationResponse(BaseDCModel):
          facets: A dictionary of facet IDs and their corresponding data.
     """
 
-  byVariable: Dict[variableDCID, Any] = Field(default_factory=dict)
-  facets: Dict[facetID, Any] = Field(default_factory=dict)
+  byVariable: Dict[variableDCID, Variable] = Field(default_factory=dict)
+  facets: Dict[facetID, Facet] = Field(default_factory=dict)
 
   def get_data_by_entity(self) -> Dict:
     """Unpacks the data for each entity, for each variable.
