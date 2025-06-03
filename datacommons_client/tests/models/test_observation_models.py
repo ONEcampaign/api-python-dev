@@ -3,7 +3,7 @@ import pytest
 from datacommons_client.models.observation import Facet
 from datacommons_client.models.observation import Observation
 from datacommons_client.models.observation import ObservationSelectList
-from datacommons_client.models.observation import OrderedFacets
+from datacommons_client.models.observation import OrderedFacet
 from datacommons_client.models.observation import Variable
 from datacommons_client.utils.error_handling import InvalidObservationSelectError
 
@@ -26,7 +26,7 @@ def test_observation_model_validation_partial():
 
 
 def test_ordered_facets_model_validation():
-  """Test that OrderedFacets.model_validate parses data correctly."""
+  """Test that OrderedFacet.model_validate parses data correctly."""
   json_data = {
       "earliestDate":
           "2023-01-01",
@@ -47,7 +47,7 @@ def test_ordered_facets_model_validation():
           },
       ],
   }
-  ordered_facets = OrderedFacets.model_validate(json_data)
+  ordered_facets = OrderedFacet.model_validate(json_data)
   assert ordered_facets.earliestDate == "2023-01-01"
   assert ordered_facets.facetId == "facet123"
   assert ordered_facets.latestDate == "2024-01-01"
@@ -57,7 +57,7 @@ def test_ordered_facets_model_validation():
 
 
 def test_ordered_facets_model_validation_empty_observations():
-  """Test OrderedFacets.model_validate with empty observations."""
+  """Test OrderedFacet.model_validate with empty observations."""
   json_data = {
       "earliestDate": "2023-01-01",
       "facetId": "facet123",
@@ -65,7 +65,7 @@ def test_ordered_facets_model_validation_empty_observations():
       "obsCount": 0,
       "observations": [],
   }
-  ordered_facets = OrderedFacets.model_validate(json_data)
+  ordered_facets = OrderedFacet.model_validate(json_data)
   assert len(ordered_facets.observations) == 0
 
 
@@ -99,7 +99,7 @@ def test_variable_model_validation():
   }
   variable = Variable.model_validate(json_data)
   assert "entity1" in variable.byEntity
-  facets = variable.byEntity["entity1"]["orderedFacets"]
+  facets = variable.byEntity["entity1"].orderedFacets
   assert len(facets) == 1
   assert facets[0].facetId == "facet1"
   assert facets[0].observations[0].value == 50.0

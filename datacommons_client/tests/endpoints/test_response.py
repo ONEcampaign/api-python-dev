@@ -5,8 +5,10 @@ from datacommons_client.endpoints.response import ObservationResponse
 from datacommons_client.endpoints.response import ResolveResponse
 from datacommons_client.models.node import Node
 from datacommons_client.models.node import NodeGroup
+from datacommons_client.models.observation import ByVariable
 from datacommons_client.models.observation import Facet
 from datacommons_client.models.observation import Observation
+from datacommons_client.models.observation import OrderedFacet
 from datacommons_client.models.observation import OrderedFacets
 from datacommons_client.models.observation import Variable
 from datacommons_client.utils.data_processing import extract_observations
@@ -521,7 +523,7 @@ def test_get_data_by_entity():
               },
           }),
   }
-  response = ObservationResponse(byVariable=mock_data)
+  response = ObservationResponse.model_validate({"byVariable": mock_data})
 
   result = response.get_data_by_entity()
 
@@ -542,7 +544,7 @@ def test_get_data_by_entity():
       },
   }
 
-  assert result == expected
+  assert result.to_dict() == expected
 
 
 def test_observation_as_dict():
@@ -662,7 +664,7 @@ def test_get_data_by_entity_from_method():
               },
           }),
   }
-  response = ObservationResponse(byVariable=mock_data)
+  response = ObservationResponse.model_validate({"byVariable": mock_data})
 
   result = response.get_data_by_entity()
 
@@ -683,7 +685,7 @@ def test_get_data_by_entity_from_method():
       },
   }
 
-  assert result == expected
+  assert result.to_dict() == expected
 
 
 def test_extract_observations():
@@ -691,10 +693,10 @@ def test_extract_observations():
   variable = "var1"
   entity = "entity1"
 
-  # Mocking OrderedFacets and Observations
-  entity_data = {
+  # Mocking OrderedFacet and Observations
+  entity_data = OrderedFacets.model_validate({
       "orderedFacets": [
-          OrderedFacets(
+          OrderedFacet(
               facetId="facet1",
               earliestDate="2023-01-01",
               latestDate="2023-01-31",
@@ -705,7 +707,7 @@ def test_extract_observations():
               ],
           )
       ]
-  }
+  })
 
   # Mocking facet metadata
   facet_metadata = {
@@ -720,28 +722,31 @@ def test_extract_observations():
   }
 
   # Extracting observations
-  result = extract_observations(variable, entity, entity_data, facet_metadata)
+  result = extract_observations(variable=variable,
+                                entity=entity,
+                                entity_data=entity_data,
+                                facet_metadata=facet_metadata)
 
   # Assertions
   assert len(result) == 2, "There should be two observation records."
-  assert result[0]["date"] == "2023-01-01"
-  assert result[0]["value"] == 10.0
-  assert result[0]["facetId"] == "facet1"
-  assert result[0]["importName"] == "Example Import"
-  assert result[1]["date"] == "2023-01-15"
-  assert result[1]["value"] == 15.0
+  assert result[0].date == "2023-01-01"
+  assert result[0].value == 10.0
+  assert result[0].facetId == "facet1"
+  assert result[0].importName == "Example Import"
+  assert result[1].date == "2023-01-15"
+  assert result[1].value == 15.0
 
 
 def test_get_observations_as_records():
   """Test that get_observations_as_records correctly converts data into records."""
   # Minimal input setup for byVariable and facets
-  mock_data = {
+  mock_data = ByVariable.model_validate({
       "variable1":
           Variable(
               byEntity={
                   "entity1": {
                       "orderedFacets": [
-                          OrderedFacets(
+                          OrderedFacet(
                               facetId="facet1",
                               observations=[
                                   Observation(date="2023-01-01", value=10.0),
@@ -751,7 +756,7 @@ def test_get_observations_as_records():
                       ]
                   }
               })
-  }
+  })
 
   mock_facets = {"facet1": Facet(importName="ImportName")}
 
@@ -782,7 +787,7 @@ def test_get_observations_as_records():
   ]
 
   # Assert the results
-  assert result == expected
+  assert result.model_dump(exclude_none=True) == expected
 
 
 ### ----- Test Resolve Response ----- ###
@@ -1018,7 +1023,7 @@ def test_get_facets_metadata(monkeypatch):
       "variable1": {
           "entity1": {
               "orderedFacets": [
-                  OrderedFacets(
+                  OrderedFacet(
                       facetId="facet1",
                       earliestDate="2023",
                       latestDate="2025",
@@ -1028,7 +1033,7 @@ def test_get_facets_metadata(monkeypatch):
           },
           "entity2": {
               "orderedFacets": [
-                  OrderedFacets(
+                  OrderedFacet(
                       facetId="facet2",
                       earliestDate="2021",
                       latestDate="2021",
@@ -1040,7 +1045,7 @@ def test_get_facets_metadata(monkeypatch):
       "variable2": {
           "entity3": {
               "orderedFacets": [
-                  OrderedFacets(
+                  OrderedFacet(
                       facetId="facet1",
                       earliestDate="2000",
                       latestDate="2013",

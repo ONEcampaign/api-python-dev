@@ -5,15 +5,16 @@ from pydantic import field_validator
 
 from datacommons_client.models.base import BaseDCModel
 from datacommons_client.models.base import facetID
-from datacommons_client.models.base import variableDCID
 from datacommons_client.models.node import Arcs
 from datacommons_client.models.node import NextToken
 from datacommons_client.models.node import Node
 from datacommons_client.models.node import NodeDCID
 from datacommons_client.models.node import Properties
 from datacommons_client.models.node import Property
+from datacommons_client.models.observation import ByVariable
 from datacommons_client.models.observation import Facet
-from datacommons_client.models.observation import Variable
+from datacommons_client.models.observation import ObservationRecords
+from datacommons_client.models.observation import VariableByEntity
 from datacommons_client.models.resolve import Entity
 from datacommons_client.utils.data_processing import flatten_properties
 from datacommons_client.utils.data_processing import observations_as_records
@@ -122,20 +123,22 @@ class ObservationResponse(BaseDCModel):
          facets: A dictionary of facet IDs and their corresponding data.
     """
 
-  byVariable: Dict[variableDCID, Variable] = Field(default_factory=dict)
+  byVariable: ByVariable = Field(default_factory=ByVariable)
   facets: Dict[facetID, Facet] = Field(default_factory=dict)
 
-  def get_data_by_entity(self) -> Dict:
+  def get_data_by_entity(self) -> VariableByEntity:
     """Unpacks the data for each entity, for each variable.
 
         Returns:
             Dict: The variables object from the response.
         """
-    return {
-        variable: data.byEntity for variable, data in self.byVariable.items()
+    raw_payload = {
+        var_dcid: var_model.byEntity
+        for var_dcid, var_model in self.byVariable.root.items()
     }
+    return VariableByEntity.model_validate(raw_payload)
 
-  def to_observation_records(self) -> List[Dict[str, Any]]:
+  def to_observation_records(self) -> ObservationRecords:
     """Returns a flat list of observation records combining date, variable, entity,
          observation, and facet metadata.
 
@@ -147,7 +150,7 @@ class ObservationResponse(BaseDCModel):
     This format is suitable for exporting to a DataFrame or serializing to JSON for tabular or analytical use.
 
     Returns:
-        List[Dict[str, Any]]: A list of observation records, where each record contains the variable,
+        ObservationRecord: A list of observation records, where each record contains the variable,
         entity, date, value, facetId, and any additional metadata provided by the facet.
         """
     return observations_as_records(data=self.get_data_by_entity(),
