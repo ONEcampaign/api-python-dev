@@ -25,7 +25,8 @@ def test_api_initialization_default(mock_check_instance, mock_resolve_instance,
 
   assert api.base_url == "https://api.datacommons.org/v2"
   assert api.headers == {"Content-Type": "application/json"}
-  mock_resolve_instance.assert_called_once_with("datacommons.org")
+  mock_resolve_instance.assert_called_once_with(dc_instance="datacommons.org",
+                                                api_version="v2")
   mock_build_headers.assert_called_once_with(None)
 
 
@@ -60,7 +61,8 @@ def test_api_initialization_with_dc_instance(mock_build_headers,
 
   assert api.base_url == "https://custom-instance/api/v2"
   assert api.headers == {"Content-Type": "application/json"}
-  mock_resolve_instance_url.assert_called_once_with("custom-instance")
+  mock_resolve_instance_url.assert_called_once_with(
+      dc_instance="custom-instance", api_version="v2")
 
 
 def test_api_initialization_invalid_args():

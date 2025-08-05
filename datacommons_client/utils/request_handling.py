@@ -46,7 +46,7 @@ def check_instance_is_valid(instance_url: str) -> str:
     raise InvalidDCInstanceError(exc.response) from exc
 
   data = response.json()
-  if "country/GTM" not in (data.get("data") or data.get("node")):
+  if "country/GTM" not in (data.get("data") or data.get("node") or {}):
     raise InvalidDCInstanceError(
         f"{instance_url} is not a valid Data Commons instance.")
 
@@ -72,7 +72,7 @@ def resolve_instance_url(dc_instance: str,
 
   # If the instance is the default, return the base URL
   if dc_instance == "datacommons.org":
-    return BASE_DC_V1 if api_version == "v1" else BASE_DC_V1
+    return BASE_DC_V1 if api_version == "v1" else BASE_DC_V2
 
   # Otherwise, validate the custom instance URL
   url = (
