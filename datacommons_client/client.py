@@ -54,6 +54,10 @@ class DataCommonsClient:
 
     # Create an instance of the API class which will be injected to the endpoints
     self.api = API(api_key=api_key, dc_instance=dc_instance, url=url)
+    self._v1_api = API(api_key=api_key,
+                       dc_instance=dc_instance,
+                       url=url,
+                       api_version="v1")
 
     # Create instances of the endpoints
     self.node = NodeEndpoint(api=self.api)
