@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Literal
+from typing import Any, Dict, Literal, Optional
 
 from datacommons_client.utils.request_handling import build_headers
 from datacommons_client.utils.request_handling import check_instance_is_valid
@@ -14,13 +14,11 @@ class API:
   to interact with the API or in combination with Endpoint classes.
   """
 
-  def __init__(
-      self,
-      api_key: Optional[str] = None,
-      dc_instance: Optional[str] = None,
-      url: Optional[str] = None,
-      api_version: Literal["v1", "v2"] = "v2"
-  ):
+  def __init__(self,
+               api_key: Optional[str] = None,
+               dc_instance: Optional[str] = None,
+               url: Optional[str] = None,
+               api_version: Literal["v1", "v2"] = "v2"):
     """
     Initializes the API instance.
 

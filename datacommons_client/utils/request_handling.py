@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Literal
+from typing import Any, Dict, Literal, Optional
 
 import requests
 from requests import exceptions
@@ -53,9 +53,8 @@ def check_instance_is_valid(instance_url: str) -> str:
   return instance_url
 
 
-def resolve_instance_url(
-    dc_instance: str, api_version: Literal["v1", "v2"] = "v2"
-) -> str:
+def resolve_instance_url(dc_instance: str,
+                         api_version: Literal["v1", "v2"] = "v2") -> str:
   """Resolve the base API URL for a given Data Commons instance.
 
     If the instance is `datacommons.org`, the default URL is returned. Otherwise,
@@ -77,8 +76,9 @@ def resolve_instance_url(
 
   # Otherwise, validate the custom instance URL
   url = (
-    f"https://{dc_instance}{CUSTOM_DC_V1 if api_version == "v1" else CUSTOM_DC_V2}"
+      f"https://{dc_instance}{CUSTOM_DC_V1 if api_version == 'v1' else CUSTOM_DC_V2}"
   )
+
   return check_instance_is_valid(url)
 
 
