@@ -192,3 +192,23 @@ class ObservationEndpoint(Endpoint):
     ).get_data_by_entity()
 
     return group_variables_by_entity(data=data)
+
+  def fetch_statvar_facet_info(
+      self,
+      variable_dcids: str | list[str],
+  ) -> ObservationResponse:
+    """
+        Fetches available statistical variables (which have observations) for given entities.
+        Args:
+            entity_dcids (str | list[str]): One or more entity DCIDs(s) to fetch variables for.
+        Returns:
+            dict[str, list[str]]: A dictionary mapping entity DCIDs to their available statistical variables.
+        """
+
+    # Fetch observations for the given entity DCIDs. If variable is empty list
+    # all available variables are retrieved.
+    return self.fetch(
+        entity_expression="Earth<-containedInPlace",
+        select=[ObservationSelect.VARIABLE, ObservationSelect.ENTITY],
+        variable_dcids=variable_dcids,
+    )

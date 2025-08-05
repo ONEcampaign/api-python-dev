@@ -4,6 +4,7 @@ from datacommons_client.endpoints.base import API
 from datacommons_client.endpoints.node import NodeEndpoint
 from datacommons_client.endpoints.observation import ObservationEndpoint
 from datacommons_client.endpoints.resolve import ResolveEndpoint
+from datacommons_client.models.metadata import StatVarMetadata
 from datacommons_client.models.observation import ObservationDate
 from datacommons_client.utils.dataframes import add_entity_names_to_observations_dataframe
 from datacommons_client.utils.decorators import requires_pandas
@@ -194,3 +195,7 @@ class DataCommonsClient:
     )
 
     return df
+
+  def fetch_statvar_metadata(self,
+                             statvar_dcids: str | list[str]) -> StatVarMetadata:
+    """Fetches metadata for one or more statistical variables."""

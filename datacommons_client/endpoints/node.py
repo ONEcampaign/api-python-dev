@@ -9,8 +9,13 @@ from datacommons_client.endpoints.base import Endpoint
 from datacommons_client.endpoints.payloads import NodeRequestPayload
 from datacommons_client.endpoints.payloads import normalize_list_to_string
 from datacommons_client.endpoints.response import NodeResponse
+from datacommons_client.models.metadata import Topic
+from datacommons_client.models.metadata import Topics
 from datacommons_client.models.node import Name
+from datacommons_client.models.node import Names
 from datacommons_client.models.node import Node
+from datacommons_client.models.node import NodeDescription
+from datacommons_client.models.node import NodeTopics
 from datacommons_client.utils.graph import build_graph_map
 from datacommons_client.utils.graph import build_relationship_tree
 from datacommons_client.utils.graph import fetch_relationship_lru
@@ -253,7 +258,7 @@ class NodeEndpoint(Endpoint):
       entity_dcids: str | list[str],
       language: Optional[str] = DEFAULT_NAME_LANGUAGE,
       fallback_language: Optional[str] = None,
-  ) -> dict[str, Name]:
+  ) -> Names:
     """
         Fetches entity names in the specified language, with optional fallback to English.
         Args:
@@ -301,7 +306,7 @@ class NodeEndpoint(Endpoint):
             property=name_property,
         )
 
-    return names
+    return Names.model_validate(names)
 
   def _fetch_contained_in_place(
       self,
@@ -534,3 +539,43 @@ class NodeEndpoint(Endpoint):
         relationship="children",
         max_concurrent_requests=max_concurrent_requests,
     )
+
+  def fetch_node_topics(self, node_dcids: str | list[str]) -> NodeTopics:
+    """"""
+    data = self.fetch_property_values(node_dcids=node_dcids,
+                                      properties=["relevantVariable"],
+                                      out=False)
+
+    topics = {}
+
+    for dcid, properties in data.get_properties().items():
+      topics[dcid] = []
+      if "relevantVariable" in properties:
+        for topic in properties["relevantVariable"]:
+          topics[dcid].append(Topic(dcid=topic.dcid, name=topic.name))
+      if topics[dcid]:
+        topics[dcid] = Topics.model_validate(topics[dcid])
+
+    return NodeTopics.model_validate(topics)
+
+  def fetch_node_description(self,
+                             node_dcids: str | list[str]) -> NodeDescription:
+    """Fetches the description for one or more nodes.
+
+        Args:
+            node_dcids (str | list[str]): The DCID(s) of the nodes to query.
+
+        Returns:
+            NodeDescription: A dictionary mapping each node DCID to its description.
+        """
+    data = self.fetch_property_values(node_dcids=node_dcids,
+                                      properties="description",
+                                      out=True).get_properties()
+
+    descriptions = {}
+
+    for dcid, properties in data.items():
+      if "description" in properties:
+        descriptions[dcid] = properties["description"][0].value
+
+    return NodeDescription.model_validate(descriptions)

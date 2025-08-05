@@ -9,6 +9,8 @@ from datacommons_client.models.base import ListLikeRootModel
 from datacommons_client.models.base import NodeDCID
 from datacommons_client.models.base import Property
 from datacommons_client.models.base import PropertyList
+from datacommons_client.models.metadata import description
+from datacommons_client.models.metadata import Topics
 
 
 class Node(BaseDCModel):
@@ -21,6 +23,7 @@ class Node(BaseDCModel):
         types: The types associated with the node.
         value: The value of the node.
     """
+
   dcid: Optional[str] = None
   name: Optional[str] = None
   provenanceId: Optional[str | list[str]] = None
@@ -40,6 +43,15 @@ class Name(BaseDCModel):
   value: str
   language: str
   property: str
+
+
+class Names(BaseDCModel, DictLikeRootModel[dict[NodeDCID, Name]]):
+  """A model to represent a mapping of node DCIDs to their names.
+
+    This model allows for multiple names per node, each with its own language and property.
+    """
+
+  pass
 
 
 class NodeGroup(BaseDCModel):
@@ -90,3 +102,12 @@ class NodeList(BaseDCModel, ListLikeRootModel[list[Node]]):
 
 class NodeDCIDList(BaseDCModel, ListLikeRootModel[list[NodeDCID]]):
   """A root model whose value is a list of NodeDCID strings."""
+
+
+class NodeTopics(BaseDCModel, DictLikeRootModel[dict[NodeDCID, Topics]]):
+  """A model to represent a mapping of node DCIDs to their topics."""
+
+
+class NodeDescription(BaseDCModel, DictLikeRootModel[dict[NodeDCID,
+                                                          description]]):
+  """A model to represent a mapping node DCIDs to their `description`."""
