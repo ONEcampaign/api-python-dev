@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Literal
 
 from datacommons_client.utils.request_handling import build_headers
 from datacommons_client.utils.request_handling import check_instance_is_valid
@@ -19,6 +19,7 @@ class API:
       api_key: Optional[str] = None,
       dc_instance: Optional[str] = None,
       url: Optional[str] = None,
+      api_version: Literal["v1", "v2"] = "v2"
   ):
     """
     Initializes the API instance.
@@ -30,6 +31,7 @@ class API:
         url: A fully qualified URL for the base API. This may be useful if more granular control
             of the API is required (for local development, for example). If provided, dc_instance`
              should not be provided.
+        api_version: The API version to use, either "v1" or "v2". Defaults to "v2".
 
     Raises:
         ValueError: If both `dc_instance` and `url` are provided.
@@ -47,7 +49,8 @@ class API:
       self.base_url = check_instance_is_valid(url.rstrip("/"))
     else:
       # Resolve from dc_instance
-      self.base_url = resolve_instance_url(dc_instance)
+      self.base_url = resolve_instance_url(dc_instance=dc_instance,
+                                           api_version=api_version)
 
   def __repr__(self) -> str:
     """Returns a readable representation of the API object.

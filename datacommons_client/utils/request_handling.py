@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Literal
 
 import requests
 from requests import exceptions
@@ -10,7 +10,9 @@ from datacommons_client.utils.error_handling import DCConnectionError
 from datacommons_client.utils.error_handling import DCStatusError
 from datacommons_client.utils.error_handling import InvalidDCInstanceError
 
+BASE_DC_V1: str = "https://api.datacommons.org/v1"
 BASE_DC_V2: str = "https://api.datacommons.org/v2"
+CUSTOM_DC_V1: str = "/core/api/v1"
 CUSTOM_DC_V2: str = "/core/api/v2"
 
 
@@ -32,7 +34,10 @@ def check_instance_is_valid(instance_url: str) -> str:
             Data Commons instance.
     """
   # Test URL for a known node in Data Commons
-  test_url = f"{instance_url}/node?nodes=country%2FGTM&property=->name"
+  if "v1" in instance_url:
+    test_url = f"{instance_url}/info/place/country/GTM"
+  else:
+    test_url = f"{instance_url}/node?nodes=country%2FGTM&property=->name"
 
   try:
     response = requests.get(test_url)
@@ -41,14 +46,16 @@ def check_instance_is_valid(instance_url: str) -> str:
     raise InvalidDCInstanceError(exc.response) from exc
 
   data = response.json()
-  if "data" not in data or "country/GTM" not in data["data"]:
+  if "country/GTM" not in (data.get("data") or data.get("node")):
     raise InvalidDCInstanceError(
         f"{instance_url} is not a valid Data Commons instance.")
 
   return instance_url
 
 
-def resolve_instance_url(dc_instance: str) -> str:
+def resolve_instance_url(
+    dc_instance: str, api_version: Literal["v1", "v2"] = "v2"
+) -> str:
   """Resolve the base API URL for a given Data Commons instance.
 
     If the instance is `datacommons.org`, the default URL is returned. Otherwise,
@@ -56,6 +63,7 @@ def resolve_instance_url(dc_instance: str) -> str:
 
     Args:
         dc_instance: The identifier or domain of the Data Commons instance.
+        api_version: The API version to use, either "v1" or "v2". Defaults to "v2".
 
     Returns:
         The resolved base API URL.
@@ -65,10 +73,12 @@ def resolve_instance_url(dc_instance: str) -> str:
 
   # If the instance is the default, return the base URL
   if dc_instance == "datacommons.org":
-    return BASE_DC_V2
+    return BASE_DC_V1 if api_version == "v1" else BASE_DC_V1
 
   # Otherwise, validate the custom instance URL
-  url = f"https://{dc_instance}{CUSTOM_DC_V2}"
+  url = (
+    f"https://{dc_instance}{CUSTOM_DC_V1 if api_version == "v1" else CUSTOM_DC_V2}"
+  )
   return check_instance_is_valid(url)
 
 
